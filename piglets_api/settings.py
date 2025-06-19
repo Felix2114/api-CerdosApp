@@ -20,13 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=osv+1&6*9*d#fa_#0-^6)c%%@8#2m1960dw)(fdbz#msfopx1'
-
+import os
+SECRET_KEY = os.environ.get('SECRET_KEY', default='unsafe-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = ['*']
 
+ALLOWED_HOSTS = []
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -79,14 +82,10 @@ WSGI_APPLICATION = 'piglets_api.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'hackernews',
-        'USER': 'postgres',
-        'PASSWORD': '12345678',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 
@@ -108,12 +107,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-GRAPHENE = {
-    'SCHEMA': 'piglets_api.schema.schema',
-    'MIDDLEWARE': [
-        'graphql_jwt.middleware.JSONWebTokenMiddleware',
-    ],
-}
 
 
 # Internationalization
@@ -132,14 +125,21 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
-import os
-
-# Definir STATIC_ROOT para almacenar los archivos estáticos recopilados
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Cambia esto si prefieres otro directorio
-
-
 
 STATIC_URL = '/static/'
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+GRAPHENE = {
+    'SCHEMA': 'piglets_api.schema.schema',
+    'MIDDLEWARE': [
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    ],
+}
+
+
 
 AUTHENTICATION_BACKENDS = [
     'graphql_jwt.backends.JSONWebTokenBackend',
@@ -147,3 +147,5 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+WEB_CURRENCY = os.environ.get('WEB_CURRENCY', 'USD') 
