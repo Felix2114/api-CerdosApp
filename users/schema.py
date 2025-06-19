@@ -32,7 +32,9 @@ class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
 
 # ...code
-class Query(graphene.AbstractType):
+
+
+class Query(graphene.ObjectType):
     me = graphene.Field(UserType)
     users = graphene.List(UserType)
 

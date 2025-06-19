@@ -1,7 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
 from users.schema import UserType
-from .models import Cerdos
 from cerdos.models import Cerdos, Vote, Comment
 from django.db.models import Q
 from graphene_django.filter import DjangoFilterConnectionField
@@ -92,6 +91,8 @@ class CreateCerdo(graphene.Mutation):
 
     def mutate(self, info, url, description, nombre, raza, peso):
         user = info.context.user or None
+        if user.is_anonymous:
+           raise GraphQLError("You must be logged in to create a cerdo.")
 
         cerdos = Cerdos(
               url=url,
