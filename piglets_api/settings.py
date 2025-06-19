@@ -80,6 +80,7 @@ WSGI_APPLICATION = 'piglets_api.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(
