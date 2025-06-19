@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'piglets_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'hackernews',
+        'USER': 'postgres',
+        'PASSWORD': '12345678',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -128,6 +132,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+import os
+
+# Definir STATIC_ROOT para almacenar los archivos estáticos recopilados
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Cambia esto si prefieres otro directorio
+
+
 
 STATIC_URL = '/static/'
 
